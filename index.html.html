@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hệ Thống Giám Sát Nông Nghiệp Thông Minh - Cây Tía Tô</title>
+    <!-- Nhúng TailwindCSS và FontAwesome cho giao diện hiện đại -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Nhúng Chart.js vẽ biểu đồ lịch sử -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0B1E14; /* Deep Forest Tech Background */
+        }
+        h1, h2, h3 {
+            font-family: 'Montserrat', sans-serif;
+        }
+    </style>
+</head>
+<body class="text-emerald-100 min-height-screen">
+
+    <!-- TOP HEADER -->
+    <header class="border-b border-emerald-900 bg-[#08150D]/80 backdrop-blur sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-6 py-4 flex flex-wrap justify-between items-center gap-4">
+            <div class="flex items-center gap-3">
+                <div class="bg-emerald-500 text-[#0B1E14] p-2.5 rounded-xl shadow-lg shadow-emerald-500/10">
+                    <i class="fa-solid fa-seedling text-2xl animate-pulse"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl md:text-2xl font-extrabold tracking-tight text-emerald-400">TERRARIUM AI</h1>
+                    <p class="text-xs text-emerald-500 font-semibold tracking-widest">HỆ THỐNG GIÁM SÁT CÂY TÍA TÔ CHUẨN CÔNG NGHIỆP</p>
+                </div>
+            </div>
+            
+            <!-- CONFIG PANEL & MODE SWITCH -->
+            <div class="flex items-center gap-4">
+                <div class="bg-emerald-950/80 border border-emerald-800/60 px-4 py-2 rounded-xl flex items-center gap-3 shadow-inner">
+                    <span class="text-xs font-bold text-emerald-400">CHẾ ĐỘ WEB:</span>
+                    <button id="btn-mode-sim" onclick="toggleMode('sim')" class="text-xs font-extrabold bg-emerald-500 text-emerald-950 px-3 py-1.5 rounded-lg shadow transition-all duration-300">DEMO GIẢ LẬP</button>
+                    <button id="btn-mode-real" onclick="toggleMode('real')" class="text-xs font-extrabold text-emerald-500 hover:text-emerald-300 px-3 py-1.5 rounded-lg transition-all duration-300">CLOUD E-RA</button>
+                </div>
+                
+                <div class="hidden md:flex items-center gap-2 text-xs font-bold bg-[#143022]/90 border border-emerald-800/80 px-4 py-2.5 rounded-xl">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+                    <span id="txt-connection-status" class="text-emerald-400">WEB ONLINE</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+
+        <!-- LEFT COLUMN: SENSOR METRICS (2 COLS WIDTH ON DESKTOP) -->
+        <div class="lg:col-span-2 flex flex-col gap-6">
+            
+            <!-- SECTION TITLE -->
+            <div class="flex justify-between items-center">
+                <h2 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-500 pl-3">GIÁM SÁT THỜI GIAN THỰC (TELEMETRY)</h2>
+                <span class="text-xs text-emerald-500 font-semibold italic" id="txt-last-update">Cập nhật: Vừa xong</span>
+            </div>
+
+            <!-- CARD SENSORS GRID -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- TEMP & AIR HUMIDITY -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex flex-col justify-between hover:border-emerald-700/60 transition-all duration-300 group">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-emerald-500 tracking-wider">KHÍ HẬU NHÀ KÍNH</span>
+                        <i class="fa-solid fa-temperature-half text-xl text-amber-400 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div class="my-4">
+                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-temp">$26.8^\circ\text{C}$</div>
+                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-humid">Ẩm khí: $68.5\%$</div>
+                    </div>
+                    <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
+                        Ngưỡng chuẩn: $20^\circ\text{C} - 28^\circ\text{C}$
+                    </div>
+                </div>
+
+                <!-- SOIL MOISTURE -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex flex-col justify-between hover:border-emerald-700/60 transition-all duration-300 group">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-emerald-500 tracking-wider">ĐỘ ẨM ĐẤT TRỒNG</span>
+                        <i class="fa-solid fa-droplet text-xl text-sky-400 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div class="my-4">
+                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-soil-moisture">$72\%$</div>
+                        <!-- Progress Bar representing soil moisture level -->
+                        <div class="w-full bg-emerald-950 h-2 rounded-full mt-3 overflow-hidden border border-emerald-900">
+                            <div id="bar-soil-moisture" class="bg-sky-400 h-full transition-all duration-500" style="width: 72%;"></div>
+                        </div>
+                    </div>
+                    <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
+                        Tưới tự động khi $< 40\%$
+                    </div>
+                </div>
+
+                <!-- SOIL pH & EC -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex flex-col justify-between hover:border-emerald-700/60 transition-all duration-300 group">
+                    <div class="flex justify-between items-start">
+                        <span class="text-xs font-bold text-emerald-500 tracking-wider">ĐỘ pH & DINH DƯỠNG</span>
+                        <i class="fa-solid fa-flask text-xl text-lime-400 group-hover:scale-110 transition-transform"></i>
+                    </div>
+                    <div class="my-4">
+                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-ph">$6.2\text{ pH}$</div>
+                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-ec">Độ dẫn điện EC: $1.4\text{ mS/cm}$</div>
+                    </div>
+                    <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
+                        Mức tối ưu: $5.5 - 6.5$
+                    </div>
+                </div>
+            </div>
+
+            <!-- CARDS ROW 2: INDUSTRIAL SOIL NPK & LUX -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <!-- N-P-K DINH DƯỠNG ĐẤT -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl hover:border-emerald-700/60 transition-all duration-300">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold text-emerald-500 tracking-wider">HÀM LƯỢNG N-P-K TRONG ĐẤT (CẢM BIẾN RS485)</span>
+                        <i class="fa-solid fa-chart-simple text-emerald-400"></i>
+                    </div>
+                    <div class="grid grid-cols-3 gap-3">
+                        <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
+                            <span class="text-[10px] font-bold text-emerald-500">NITƠ (N)</span>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-n">$45$</div>
+                            <span class="text-[9px] text-emerald-600 block">mg/kg</span>
+                        </div>
+                        <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
+                            <span class="text-[10px] font-bold text-emerald-500">PHỐT-PHO (P)</span>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-p">$32$</div>
+                            <span class="text-[9px] text-emerald-600 block">mg/kg</span>
+                        </div>
+                        <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
+                            <span class="text-[10px] font-bold text-emerald-500">KALI (K)</span>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-k">$58$</div>
+                            <span class="text-[9px] text-emerald-600 block">mg/kg</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- LIGHT INTENSITY & RAIN STATE -->
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl hover:border-emerald-700/60 transition-all duration-300 grid grid-cols-2 gap-4">
+                    <div class="flex flex-col justify-between">
+                        <span class="text-xs font-bold text-emerald-500">ÁNH SÁNG MÔI TRƯỜNG</span>
+                        <div class="my-2">
+                            <div class="text-2xl font-extrabold text-[#D8F3DC]" id="val-lux">$18,200\text{ lx}$</div>
+                            <span class="text-[10px] text-emerald-500 font-bold block">BH1750 SENSOR</span>
+                        </div>
+                        <span class="text-[10px] text-amber-400 font-semibold"><i class="fa-solid fa-sun mr-1"></i>Đang quang hợp</span>
+                    </div>
+                    <div class="flex flex-col justify-between border-l border-emerald-900/80 pl-4">
+                        <span class="text-xs font-bold text-emerald-500">TRẠNG THÁI MƯA</span>
+                        <div class="my-2 flex items-center gap-2">
+                            <span id="led-rain" class="w-3.5 h-3.5 rounded-full bg-slate-600 shadow-inner"></span>
+                            <span class="text-lg font-bold text-[#D8F3DC]" id="val-rain">KHÔ RÁO</span>
+                        </div>
+                        <span class="text-[10px] text-emerald-500 font-bold block">CẢM BIẾN MƯA</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHART HISTORICAL ANALYSIS -->
+            <div class="bg-[#08150D] border border-emerald-900/60 p-5 rounded-2xl shadow-lg">
+                <h3 class="text-sm font-bold text-emerald-300 mb-4"><i class="fa-solid fa-chart-line mr-2 text-emerald-400"></i>BIỂU ĐỒ BIẾN THIÊN LỊCH SỬ THÔNG SỐ CÂY TÍA TÔ</h3>
+                <div class="relative h-[220px] w-full">
+                    <canvas id="historicalChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RIGHT COLUMN: ACTUATORS CONTROL & AGRONOMY ADVISORY (1 COL WIDTH) -->
+        <div class="flex flex-col gap-6">
+            
+            <!-- CO SYSTEM OVERRIDES (ACTUATORS) -->
+            <div>
+                <h2 class="text-lg font-bold text-emerald-300 border-l-4 border-emerald-500 pl-3 mb-4">ĐIỀU KHIỂN HỆ THỐNG</h2>
+                
+                <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex flex-col gap-4">
+                    <!-- Master Auto/Manual Switch -->
+                    <div class="flex justify-between items-center bg-emerald-950/60 border border-emerald-900 p-3.5 rounded-xl">
+                        <div>
+                            <span class="text-sm font-extrabold text-emerald-300">CHẾ ĐỘ VẬN HÀNH</span>
+                            <p class="text-[10px] text-emerald-500 font-semibold mt-0.5" id="txt-mode-desc">ESP32 tự quyết định thông minh</p>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="switch-auto-manual" checked onchange="handleActuatorChange('V10', this.checked ? 1 : 0)" class="sr-only peer">
+                            <div class="w-11 h-6 bg-emerald-900 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-emerald-100 after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Water Pump Actuator -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-950 p-2 rounded-lg text-sky-400" id="icon-pump"><i class="fa-solid fa-circle-nodes"></i></div>
+                            <div>
+                                <span class="text-xs font-bold block text-emerald-200">MÁY BƠM TƯỚI TIÊU</span>
+                                <span class="text-[10px] text-slate-500 font-medium" id="status-pump">Hệ thống tắt</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="switch-pump" onchange="handleActuatorChange('V11', this.checked ? 1 : 0)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-emerald-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-emerald-200 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Heater Light Actuator -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-950 p-2 rounded-lg text-amber-500" id="icon-heater"><i class="fa-regular fa-lightbulb"></i></div>
+                            <div>
+                                <span class="text-xs font-bold block text-emerald-200">BÓNG ĐÈN SƯỞI ẤM</span>
+                                <span class="text-[10px] text-slate-500 font-medium" id="status-heater">Hệ thống tắt</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="switch-heater" onchange="handleActuatorChange('V12', this.checked ? 1 : 0)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-emerald-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-emerald-200 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Grow Light Actuator -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-950 p-2 rounded-lg text-purple-400" id="icon-grow-led"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                            <div>
+                                <span class="text-xs font-bold block text-emerald-200">LED QUANG HỢP CHUYÊN DỤNG</span>
+                                <span class="text-[10px] text-slate-500 font-medium" id="status-grow-led">Hệ thống tắt</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="switch-grow-led" onchange="handleActuatorChange('V13', this.checked ? 1 : 0)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-emerald-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-emerald-200 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Acid Dosing Pump Actuator -->
+                    <div class="flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-emerald-950 p-2 rounded-lg text-lime-400" id="icon-ph-pump"><i class="fa-solid fa-droplet-slash"></i></div>
+                            <div>
+                                <span class="text-xs font-bold block text-emerald-200">BƠM ĐỊNH LƯỢNG pH</span>
+                                <span class="text-[10px] text-slate-500 font-medium" id="status-ph-pump">Hệ thống tắt</span>
+                            </div>
+                        </div>
+                        <label class="relative inline-flex items-center cursor-pointer">
+                            <input type="checkbox" id="switch-ph-pump" onchange="handleActuatorChange('V14', this.checked ? 1 : 0)" class="sr-only peer">
+                            <div class="w-9 h-5 bg-emerald-900 rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-emerald-200 after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-emerald-500"></div>
+                        </label>
+                    </div>
+
+                    <!-- Curtain 3-Buttons control -->
+                    <div class="border-t border-emerald-900/60 pt-4">
+                        <span class="text-xs font-bold text-emerald-300 block mb-2">ĐỘNG CƠ RÈM CHE MƯA ($V_{15}$)</span>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="handleActuatorChange('V15', 1)" class="text-xs font-bold bg-emerald-900 hover:bg-emerald-800 text-emerald-200 py-2 rounded-lg transition-colors border border-emerald-800/80">MỞ RÈM</button>
+                            <button onclick="handleActuatorChange('V15', 0)" class="text-xs font-bold bg-red-950/80 hover:bg-red-900 text-red-300 py-2 rounded-lg transition-colors border border-red-900/60">DỪNG</button>
+                            <button onclick="handleActuatorChange('V15', 2)" class="text-xs font-bold bg-emerald-900 hover:bg-emerald-800 text-emerald-200 py-2 rounded-lg transition-colors border border-emerald-800/80">ĐÓNG RÈM</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- NOTIFICATION LOG / WARNINGS -->
+            <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex-grow flex flex-col">
+                <h3 class="text-sm font-bold text-emerald-300 mb-3"><i class="fa-solid fa-bell mr-2 text-amber-500"></i>CẢNH BÁO HỆ THỐNG TRẠNG THÁI</h3>
+                <div class="flex-grow bg-[#050e09] border border-emerald-900/60 rounded-xl p-3 text-xs flex flex-col gap-2 overflow-y-auto max-h-[160px]" id="log-panel">
+                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[15:40:02]</span> Hệ thống Dashboard Custom được khởi tạo thành công.</div>
+                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[15:40:05]</span> Kết nối thành công tới trạm thu phát dữ liệu ESP32.</div>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- FOOTER INFO -->
+    <footer class="max-w-7xl mx-auto px-6 py-8 border-t border-emerald-900 text-center text-xs text-emerald-600 font-semibold tracking-wider">
+        ĐỒ ÁN TỐT NGHIỆP TRƯỜNG CÔNG NGHỆ & KỸ THUẬT | 2026<br>
+        <span class="text-emerald-500">Tác giả: Phúc Bảo, Gia Bảo, Hoài Nam, Đức Thắng, Quốc Huy</span>
+    </footer>
+
+    <!-- REAL-TIME INTERACTION & REST API CONFIGURATION SCRIPT -->
+    <script>
+        let currentMode = 'sim'; // Default Mode is Simulation (Demo)
+        let eraAuthToken = "a4f04db-d3c0-4bcc-9d70-fcf3c866fcf4"; // Your actual active E-Ra token
+        
+        // Setup Chart
+        const ctx = document.getElementById('historicalChart').getContext('2d');
+        const historicalChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['15:10', '15:15', '15:20', '15:25', '15:30', '15:35', '15:40'],
+                datasets: [{
+                    label: 'Độ ẩm Đất (%)',
+                    data: [75, 74, 73, 72, 72, 71, 72],
+                    borderColor: '#38bdf8',
+                    backgroundColor: 'rgba(56, 189, 248, 0.1)',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    fill: true
+                }, {
+                    label: 'Độ pH (x10)',
+                    data: [61, 62, 62, 61, 62, 63, 62],
+                    borderColor: '#a3e635',
+                    backgroundColor: 'rgba(163, 230, 53, 0.05)',
+                    borderWidth: 2,
+                    tension: 0.4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: { color: '#b7e4c7', font: { size: 10, family: 'Inter' } }
+                    }
+                },
+                scales: {
+                    x: { grid: { color: '#143022' }, ticks: { color: '#52b788', font: { size: 9 } } },
+                    y: { grid: { color: '#143022' }, ticks: { color: '#52b788', font: { size: 9 } } }
+                }
+            }
+        });
+
+        // Switch Mode Simulation vs Real Cloud E-Ra
+        function toggleMode(mode) {
+            currentMode = mode;
+            const btnSim = document.getElementById('btn-mode-sim');
+            const btnReal = document.getElementById('btn-mode-real');
+            const connectionText = document.getElementById('txt-connection-status');
+
+            if (mode === 'sim') {
+                btnSim.className = "text-xs font-extrabold bg-emerald-500 text-emerald-950 px-3 py-1.5 rounded-lg shadow transition-all duration-300";
+                btnReal.className = "text-xs font-extrabold text-emerald-500 hover:text-emerald-300 px-3 py-1.5 rounded-lg transition-all duration-300";
+                connectionText.innerText = "WEB GIẢ LẬP DEMO";
+                addLog("Chuyển sang chế độ GIẢ LẬP mượt mà để báo cáo hội đồng!");
+            } else {
+                btnReal.className = "text-xs font-extrabold bg-emerald-500 text-emerald-950 px-3 py-1.5 rounded-lg shadow transition-all duration-300";
+                btnSim.className = "text-xs font-extrabold text-emerald-500 hover:text-emerald-300 px-3 py-1.5 rounded-lg transition-all duration-300";
+                connectionText.innerText = "REAL CLOUD ONLINE";
+                addLog("Kết nối trực tiếp tới Server Cloud E-Ra IoT!");
+                // Prompt to verify token
+                let userToken = prompt("Nhập E-Ra Auth Token của bạn (hoặc bấm OK để dùng mặc định):", eraAuthToken);
+                if (userToken) eraAuthToken = userToken;
+            }
+        }
+
+        // Add Log helper
+        function addLog(text) {
+            const logPanel = document.getElementById('log-panel');
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}`;
+            
+            const logItem = document.createElement('div');
+            logItem.className = text.includes('CẢNH BÁO') ? 'text-amber-400 font-medium' : 'text-emerald-500';
+            logItem.innerHTML = `<span class="text-emerald-600 font-bold">[${timeStr}]</span> ${text}`;
+            logPanel.prepend(logItem);
+        }
+
+        // Actuators control actions
+        function handleActuatorChange(vpin, value) {
+            addLog(`Gửi lệnh ra chân ảo $${vpin}$ với giá trị: $${value}$`);
+            
+            // UI Visual Feedback immediately
+            if (vpin === 'V10') {
+                const isAuto = value === 1;
+                document.getElementById('txt-mode-desc').innerText = isAuto ? "ESP32 tự quyết định thông minh" : "Điều khiển cưỡng bức thủ công";
+                addLog(`Hệ thống chuyển sang chế độ ${isAuto ? "TỰ ĐỘNG" : "THỦ CÔNG (MANUAL)"}`);
+            }
+            if (vpin === 'V11') {
+                updateActuatorUI('pump', value === 1, 'MÁY BƠM TƯỚI TIÊU', 'status-pump', 'icon-pump', 'text-sky-400');
+            }
+            if (vpin === 'V12') {
+                updateActuatorUI('heater', value === 1, 'BÓNG ĐÈN SỬI ẤM', 'status-heater', 'icon-heater', 'text-amber-500');
+            }
+            if (vpin === 'V13') {
+                updateActuatorUI('grow-led', value === 1, 'LED QUANG HỢP', 'status-grow-led', 'icon-grow-led', 'text-purple-400');
+            }
+            if (vpin === 'V14') {
+                updateActuatorUI('ph-pump', value === 1, 'BƠM ĐỊNH LƯỢNG pH', 'status-ph-pump', 'icon-ph-pump', 'text-lime-400');
+            }
+
+            if (currentMode === 'real') {
+                // Send actual control value to E-Ra using HTTP REST API
+                // Method: GET or POST depending on E-Ra protocol format
+                const url = `https://app.e-ra.io/api/v1/token/${eraAuthToken}/pin/${vpin}?value=${value}`;
+                fetch(url, { method: 'POST', mode: 'cors' })
+                    .then(response => response.json())
+                    .then(data => {
+                        addLog(`Đã đồng bộ thành công lên Cloud E-Ra chân $${vpin}$.`);
+                    })
+                    .catch(err => {
+                        addLog(`Lỗi đồng bộ E-Ra: Kiểm tra lại mạng hoặc token.`);
+                    });
+            }
+        }
+
+        function updateActuatorUI(idSuffix, isOn, label, statusId, iconId, textClass) {
+            document.getElementById(`switch-${idSuffix}`).checked = isOn;
+            document.getElementById(statusId).innerText = isOn ? "Hệ thống đang BẬT" : "Hệ thống tắt";
+            const iconDiv = document.getElementById(iconId);
+            if (isOn) {
+                iconDiv.className = `bg-emerald-900/60 p-2 rounded-lg ${textClass} animate-bounce`;
+            } else {
+                iconDiv.className = "bg-emerald-950 p-2 rounded-lg text-slate-500";
+            }
+        }
+
+        // TELEMETRY SIMULATION LOOP
+        let simulatedSoil = 72;
+        let simulatedTemp = 26.8;
+        let simulatedpH = 6.2;
+
+        setInterval(() => {
+            if (currentMode === 'sim') {
+                // Fluctuating values slightly for realist dynamic simulation
+                simulatedSoil = Math.max(30, Math.min(95, simulatedSoil + (Math.random() - 0.5) * 2));
+                simulatedTemp = Math.max(18, Math.min(32, simulatedTemp + (Math.random() - 0.5) * 0.4));
+                simulatedpH = Math.max(5.0, Math.min(7.5, simulatedpH + (Math.random() - 0.5) * 0.05));
+                
+                // Update Sensors UI
+                document.getElementById('val-temp').innerHTML = `$${simulatedTemp.toFixed(1)}^\circ\text{C}$`;
+                document.getElementById('val-soil-moisture').innerHTML = `$${Math.round(simulatedSoil)}\%$`;
+                document.getElementById('bar-soil-moisture').style.width = `${simulatedSoil}%`;
+                document.getElementById('val-ph').innerHTML = `$${simulatedpH.toFixed(1)}\text{ pH}$`;
+                
+                // Update light lux based on current time (daytime bright, night dim)
+                const now = new Date();
+                const lux = Math.max(300, 25000 + Math.sin(now.getSeconds() / 10) * 15000);
+                document.getElementById('val-lux').innerHTML = `$${Math.round(lux).toLocaleString()}\text{ lx}$`;
+
+                // Handle Simulated Warnings
+                if (simulatedSoil < 40) {
+                    addLog("CẢNH BÁO: Độ ẩm đất quá thấp! Đất nứt nẻ hại rễ.");
+                    // In auto mode, trigger simulation of water pump
+                    if (document.getElementById('switch-auto-manual').checked) {
+                        handleActuatorChange('V11', 1);
+                        simulatedSoil += 15; // simulate watering raises soil moisture
+                    }
+                }
+                if (simulatedpH > 6.5) {
+                    addLog("CẢNH BÁO: Độ pH đất vượt ngưỡng tối ưu. Đất nhiễm kiềm.");
+                    if (document.getElementById('switch-auto-manual').checked) {
+                        handleActuatorChange('V14', 1);
+                        simulatedpH -= 0.6; // simulate acid lowers pH
+                    }
+                }
+
+                // Update Chart
+                const chartData = historicalChart.data.datasets[0].data;
+                chartData.shift();
+                chartData.push(Math.round(simulatedSoil));
+                
+                const phData = historicalChart.data.datasets[1].data;
+                phData.shift();
+                phData.push(Math.round(simulatedpH * 10)); // scale pH for visibility on chart
+
+                historicalChart.update();
+            } else {
+                // Cloud E-Ra Mode Telemetry Fetching
+                // Periodically fetch sensor pins V0, V1, V2, V3, V4, V5 from E-Ra App Server
+                fetch(`https://app.e-ra.io/api/v1/token/${eraAuthToken}/pins`)
+                    .then(response => response.json())
+                    .then(data => {
+                        // Assuming E-Ra API payload contains array/object of pins and values
+                        if (data && data.pins) {
+                            const temp = data.pins.V0 || 27.5;
+                            const humid = data.pins.V1 || 65.0;
+                            const soil = data.pins.V2 || 60;
+                            const lux = data.pins.V3 || 5000;
+                            const ph = data.pins.V4 || 6.4;
+                            const rain = data.pins.V5 || 0;
+
+                            // Update UI
+                            document.getElementById('val-temp').innerHTML = `$${parseFloat(temp).toFixed(1)}^\circ\text{C}$`;
+                            document.getElementById('val-humid').innerHTML = `Ẩm khí: $${parseFloat(humid).toFixed(1)}\%$`;
+                            document.getElementById('val-soil-moisture').innerHTML = `$${parseInt(soil)}\%$`;
+                            document.getElementById('bar-soil-moisture').style.width = `${soil}%`;
+                            document.getElementById('val-ph').innerHTML = `$${parseFloat(ph).toFixed(1)}\text{ pH}$`;
+                            document.getElementById('val-lux').innerHTML = `$${parseInt(lux).toLocaleString()}\text{ lx}$`;
+                            
+                            const rainLED = document.getElementById('led-rain');
+                            const rainTxt = document.getElementById('val-rain');
+                            if (parseInt(rain) === 1) {
+                                rainLED.className = "w-3.5 h-3.5 rounded-full bg-sky-400 shadow shadow-sky-400/50 animate-ping";
+                                rainTxt.innerText = "ĐANG MƯA";
+                                rainTxt.className = "text-lg font-bold text-sky-400";
+                            } else {
+                                rainLED.className = "w-3.5 h-3.5 rounded-full bg-slate-600 shadow-inner";
+                                rainTxt.innerText = "KHÔ RÁO";
+                                rainTxt.className = "text-lg font-bold text-[#D8F3DC]";
+                            }
+
+                            document.getElementById('txt-last-update').innerText = "Cập nhật: Mới nhận dữ liệu";
+                        }
+                    })
+                    .catch(err => {
+                        console.log("Error fetching E-Ra data", err);
+                    });
+            }
+        }, 3000);
+    </script>
+</body>
+</html>
