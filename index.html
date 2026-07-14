@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <!-- Nhúng Chart.js vẽ biểu đồ lịch sử -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800&display=swap');
         body {
@@ -20,7 +21,7 @@
         }
     </style>
 </head>
-<body class="text-emerald-100 min-height-screen">
+<body class="text-emerald-100 min-h-screen flex flex-col justify-between">
 
     <!-- TOP HEADER -->
     <header class="border-b border-emerald-900 bg-[#08150D]/80 backdrop-blur sticky top-0 z-50">
@@ -52,7 +53,7 @@
     </header>
 
     <!-- MAIN BODY -->
-    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="max-w-7xl mx-auto p-6 grid grid-cols-1 lg:grid-cols-3 gap-6 w-full flex-grow">
 
         <!-- LEFT COLUMN: SENSOR METRICS (2 COLS WIDTH ON DESKTOP) -->
         <div class="lg:col-span-2 flex flex-col gap-6">
@@ -72,11 +73,13 @@
                         <i class="fa-solid fa-temperature-half text-xl text-amber-400 group-hover:scale-110 transition-transform"></i>
                     </div>
                     <div class="my-4">
-                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-temp">$26.8^\circ\text{C}$</div>
-                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-humid">Ẩm khí: $68.5\%$</div>
+                        <div class="text-4xl font-extrabold text-[#D8F3DC] flex items-baseline" id="val-temp">
+                            <span>26.8</span><span class="text-lg text-amber-400 ml-1">°C</span>
+                        </div>
+                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-humid">Ẩm khí: 68.5%</div>
                     </div>
                     <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
-                        Ngưỡng chuẩn: $20^\circ\text{C} - 28^\circ\text{C}$
+                        Ngưỡng chuẩn: 20°C - 28°C
                     </div>
                 </div>
 
@@ -87,14 +90,16 @@
                         <i class="fa-solid fa-droplet text-xl text-sky-400 group-hover:scale-110 transition-transform"></i>
                     </div>
                     <div class="my-4">
-                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-soil-moisture">$72\%$</div>
+                        <div class="text-4xl font-extrabold text-[#D8F3DC] flex items-baseline" id="val-soil-moisture">
+                            <span>72</span><span class="text-lg text-sky-400 ml-1">%</span>
+                        </div>
                         <!-- Progress Bar representing soil moisture level -->
                         <div class="w-full bg-emerald-950 h-2 rounded-full mt-3 overflow-hidden border border-emerald-900">
                             <div id="bar-soil-moisture" class="bg-sky-400 h-full transition-all duration-500" style="width: 72%;"></div>
                         </div>
                     </div>
                     <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
-                        Tưới tự động khi $< 40\%$
+                        Tưới tự động khi < 40%
                     </div>
                 </div>
 
@@ -105,11 +110,13 @@
                         <i class="fa-solid fa-flask text-xl text-lime-400 group-hover:scale-110 transition-transform"></i>
                     </div>
                     <div class="my-4">
-                        <div class="text-3xl font-extrabold text-[#D8F3DC]" id="val-ph">$6.2\text{ pH}$</div>
-                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-ec">Độ dẫn điện EC: $1.4\text{ mS/cm}$</div>
+                        <div class="text-4xl font-extrabold text-[#D8F3DC] flex items-baseline" id="val-ph">
+                            <span>6.2</span><span class="text-lg text-lime-400 ml-1">pH</span>
+                        </div>
+                        <div class="text-sm font-semibold text-emerald-400 mt-1" id="val-ec">Độ dẫn điện EC: 1.4 mS/cm</div>
                     </div>
                     <div class="text-[11px] bg-emerald-950/80 border border-emerald-900 px-2.5 py-1 rounded-lg text-emerald-400 font-medium">
-                        Mức tối ưu: $5.5 - 6.5$
+                        Mức tối ưu: 5.5 - 6.5
                     </div>
                 </div>
             </div>
@@ -125,17 +132,17 @@
                     <div class="grid grid-cols-3 gap-3">
                         <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
                             <span class="text-[10px] font-bold text-emerald-500">NITƠ (N)</span>
-                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-n">$45$</div>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-n">45</div>
                             <span class="text-[9px] text-emerald-600 block">mg/kg</span>
                         </div>
                         <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
                             <span class="text-[10px] font-bold text-emerald-500">PHỐT-PHO (P)</span>
-                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-p">$32$</div>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-p">32</div>
                             <span class="text-[9px] text-emerald-600 block">mg/kg</span>
                         </div>
                         <div class="bg-emerald-950/60 border border-emerald-900 p-3 rounded-xl text-center">
                             <span class="text-[10px] font-bold text-emerald-500">KALI (K)</span>
-                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-k">$58$</div>
+                            <div class="text-xl font-extrabold text-[#DEFF9A] mt-1" id="val-npk-k">58</div>
                             <span class="text-[9px] text-emerald-600 block">mg/kg</span>
                         </div>
                     </div>
@@ -146,7 +153,9 @@
                     <div class="flex flex-col justify-between">
                         <span class="text-xs font-bold text-emerald-500">ÁNH SÁNG MÔI TRƯỜNG</span>
                         <div class="my-2">
-                            <div class="text-2xl font-extrabold text-[#D8F3DC]" id="val-lux">$18,200\text{ lx}$</div>
+                            <div class="text-2xl font-extrabold text-[#D8F3DC] flex items-baseline" id="val-lux">
+                                <span>18,200</span><span class="text-sm font-normal text-amber-400 ml-1">lx</span>
+                            </div>
                             <span class="text-[10px] text-emerald-500 font-bold block">BH1750 SENSOR</span>
                         </div>
                         <span class="text-[10px] text-amber-400 font-semibold"><i class="fa-solid fa-sun mr-1"></i>Đang quang hợp</span>
@@ -254,7 +263,7 @@
 
                     <!-- Curtain 3-Buttons control -->
                     <div class="border-t border-emerald-900/60 pt-4">
-                        <span class="text-xs font-bold text-emerald-300 block mb-2">ĐỘNG CƠ RÈM CHE MƯA ($V_{15}$)</span>
+                        <span class="text-xs font-bold text-emerald-300 block mb-2">ĐỘNG CƠ RÈM CHE MƯA (V15)</span>
                         <div class="grid grid-cols-3 gap-2">
                             <button onclick="handleActuatorChange('V15', 1)" class="text-xs font-bold bg-emerald-900 hover:bg-emerald-800 text-emerald-200 py-2 rounded-lg transition-colors border border-emerald-800/80">MỞ RÈM</button>
                             <button onclick="handleActuatorChange('V15', 0)" class="text-xs font-bold bg-red-950/80 hover:bg-red-900 text-red-300 py-2 rounded-lg transition-colors border border-red-900/60">DỪNG</button>
@@ -268,8 +277,8 @@
             <div class="bg-emerald-950/40 border border-emerald-900/60 p-5 rounded-2xl flex-grow flex flex-col">
                 <h3 class="text-sm font-bold text-emerald-300 mb-3"><i class="fa-solid fa-bell mr-2 text-amber-500"></i>CẢNH BÁO HỆ THỐNG TRẠNG THÁI</h3>
                 <div class="flex-grow bg-[#050e09] border border-emerald-900/60 rounded-xl p-3 text-xs flex flex-col gap-2 overflow-y-auto max-h-[160px]" id="log-panel">
-                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[15:40:02]</span> Hệ thống Dashboard Custom được khởi tạo thành công.</div>
-                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[15:40:05]</span> Kết nối thành công tới trạm thu phát dữ liệu ESP32.</div>
+                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[11:15:02]</span> Hệ thống Dashboard Custom được khởi tạo thành công.</div>
+                    <div class="text-emerald-500"><span class="text-emerald-600 font-bold">[11:15:05]</span> Kết nối thành công tới trạm thu phát dữ liệu ESP32.</div>
                 </div>
             </div>
 
@@ -277,7 +286,7 @@
     </main>
 
     <!-- FOOTER INFO -->
-    <footer class="max-w-7xl mx-auto px-6 py-8 border-t border-emerald-900 text-center text-xs text-emerald-600 font-semibold tracking-wider">
+    <footer class="max-w-7xl mx-auto px-6 py-8 border-t border-emerald-900 text-center text-xs text-emerald-600 font-semibold tracking-wider w-full">
         ĐỒ ÁN TỐT NGHIỆP TRƯỜNG CÔNG NGHỆ & KỸ THUẬT | 2026<br>
         <span class="text-emerald-500">Tác giả: Phúc Bảo, Gia Bảo, Hoài Nam, Đức Thắng, Quốc Huy</span>
     </footer>
@@ -292,7 +301,7 @@
         const historicalChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['15:10', '15:15', '15:20', '15:25', '15:30', '15:35', '15:40'],
+                labels: ['11:10', '11:15', '11:20', '11:25', '11:30', '11:35', '11:40'],
                 datasets: [{
                     label: 'Độ ẩm Đất (%)',
                     data: [75, 74, 73, 72, 72, 71, 72],
@@ -362,7 +371,7 @@
 
         // Actuators control actions
         function handleActuatorChange(vpin, value) {
-            addLog(`Gửi lệnh ra chân ảo $${vpin}$ với giá trị: $${value}$`);
+            addLog(`Gửi lệnh ra chân ảo ${vpin} với giá trị: ${value}`);
             
             // UI Visual Feedback immediately
             if (vpin === 'V10') {
@@ -385,12 +394,11 @@
 
             if (currentMode === 'real') {
                 // Send actual control value to E-Ra using HTTP REST API
-                // Method: GET or POST depending on E-Ra protocol format
                 const url = `https://app.e-ra.io/api/v1/token/${eraAuthToken}/pin/${vpin}?value=${value}`;
                 fetch(url, { method: 'POST', mode: 'cors' })
                     .then(response => response.json())
                     .then(data => {
-                        addLog(`Đã đồng bộ thành công lên Cloud E-Ra chân $${vpin}$.`);
+                        addLog(`Đã đồng bộ thành công lên Cloud E-Ra chân ${vpin}.`);
                     })
                     .catch(err => {
                         addLog(`Lỗi đồng bộ E-Ra: Kiểm tra lại mạng hoặc token.`);
@@ -421,16 +429,17 @@
                 simulatedTemp = Math.max(18, Math.min(32, simulatedTemp + (Math.random() - 0.5) * 0.4));
                 simulatedpH = Math.max(5.0, Math.min(7.5, simulatedpH + (Math.random() - 0.5) * 0.05));
                 
-                // Update Sensors UI
-                document.getElementById('val-temp').innerHTML = `$${simulatedTemp.toFixed(1)}^\circ\text{C}$`;
-                document.getElementById('val-soil-moisture').innerHTML = `$${Math.round(simulatedSoil)}\%$`;
+                // Update Sensors UI using native clean HTML structure
+                document.getElementById('val-temp').innerHTML = `<span>${simulatedTemp.toFixed(1)}</span><span class="text-lg text-amber-400 ml-1">°C</span>`;
+                document.getElementById('val-humid').innerHTML = `Ẩm khí: 68.5%`;
+                document.getElementById('val-soil-moisture').innerHTML = `<span>${Math.round(simulatedSoil)}</span><span class="text-lg text-sky-400 ml-1">%</span>`;
                 document.getElementById('bar-soil-moisture').style.width = `${simulatedSoil}%`;
-                document.getElementById('val-ph').innerHTML = `$${simulatedpH.toFixed(1)}\text{ pH}$`;
+                document.getElementById('val-ph').innerHTML = `<span>${simulatedpH.toFixed(1)}</span><span class="text-lg text-lime-400 ml-1">pH</span>`;
                 
-                // Update light lux based on current time (daytime bright, night dim)
+                // Update light lux based on current time
                 const now = new Date();
                 const lux = Math.max(300, 25000 + Math.sin(now.getSeconds() / 10) * 15000);
-                document.getElementById('val-lux').innerHTML = `$${Math.round(lux).toLocaleString()}\text{ lx}$`;
+                document.getElementById('val-lux').innerHTML = `<span>${Math.round(lux).toLocaleString()}</span><span class="text-sm font-normal text-amber-400 ml-1">lx</span>`;
 
                 // Handle Simulated Warnings
                 if (simulatedSoil < 40) {
@@ -461,11 +470,9 @@
                 historicalChart.update();
             } else {
                 // Cloud E-Ra Mode Telemetry Fetching
-                // Periodically fetch sensor pins V0, V1, V2, V3, V4, V5 from E-Ra App Server
                 fetch(`https://app.e-ra.io/api/v1/token/${eraAuthToken}/pins`)
                     .then(response => response.json())
                     .then(data => {
-                        // Assuming E-Ra API payload contains array/object of pins and values
                         if (data && data.pins) {
                             const temp = data.pins.V0 || 27.5;
                             const humid = data.pins.V1 || 65.0;
@@ -474,13 +481,13 @@
                             const ph = data.pins.V4 || 6.4;
                             const rain = data.pins.V5 || 0;
 
-                            // Update UI
-                            document.getElementById('val-temp').innerHTML = `$${parseFloat(temp).toFixed(1)}^\circ\text{C}$`;
-                            document.getElementById('val-humid').innerHTML = `Ẩm khí: $${parseFloat(humid).toFixed(1)}\%$`;
-                            document.getElementById('val-soil-moisture').innerHTML = `$${parseInt(soil)}\%$`;
+                            // Update UI using clean native HTML formatting
+                            document.getElementById('val-temp').innerHTML = `<span>${parseFloat(temp).toFixed(1)}</span><span class="text-lg text-amber-400 ml-1">°C</span>`;
+                            document.getElementById('val-humid').innerHTML = `Ẩm khí: ${parseFloat(humid).toFixed(1)}%`;
+                            document.getElementById('val-soil-moisture').innerHTML = `<span>${parseInt(soil)}</span><span class="text-lg text-sky-400 ml-1">%</span>`;
                             document.getElementById('bar-soil-moisture').style.width = `${soil}%`;
-                            document.getElementById('val-ph').innerHTML = `$${parseFloat(ph).toFixed(1)}\text{ pH}$`;
-                            document.getElementById('val-lux').innerHTML = `$${parseInt(lux).toLocaleString()}\text{ lx}$`;
+                            document.getElementById('val-ph').innerHTML = `<span>${parseFloat(ph).toFixed(1)}</span><span class="text-lg text-lime-400 ml-1">pH</span>`;
+                            document.getElementById('val-lux').innerHTML = `<span>${parseInt(lux).toLocaleString()}</span><span class="text-sm font-normal text-amber-400 ml-1">lx</span>`;
                             
                             const rainLED = document.getElementById('led-rain');
                             const rainTxt = document.getElementById('val-rain');
@@ -505,3 +512,5 @@
     </script>
 </body>
 </html>
+```
+eof
